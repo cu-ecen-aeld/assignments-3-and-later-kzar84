@@ -18,7 +18,7 @@ dir=$(dirname $writefile)
 fln=$(basename $writefile)
 
 mkdir -p $dir
-echo $writestr >> ${dir}/${fln}
+echo $writestr > ${dir}/${fln}
 
 if [[ $? -ne 0 ]]; then
     echo "Unable to create file"
