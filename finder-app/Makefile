@@ -3,7 +3,7 @@ TARGET = writer
 OBJS := $(SRC:.c=.o)
 
 
-CROSS_COMPILE ?= native
+CC := $(CROSS_COMPILE)gcc
 
 all: $(TARGET)
 
@@ -14,8 +14,8 @@ ifeq ($(CROSS_COMPILE), native)
 endif
 
 ifeq ($(CROSS_COMPILE), aarch64-none-linux-gnu-)
-	aarch64-none-linux-gnu-gcc -g -Wall -c -o $(OBJS) $(SRC)
-	aarch64-none-linux-gnu-gcc -g -Wall -I/ $(OBJS) -o  $(TARGET)
+	$(CC) -g -Wall -c -o $(OBJS) $(SRC)
+	$(CC) -g -Wall -I/ $(OBJS) -o  $(TARGET)
 endif
 
 

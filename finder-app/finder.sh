@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 usage() {
     echo "Usage: ./finder.sh <existing_directory> <search_string>"
