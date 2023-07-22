@@ -47,6 +47,7 @@ bool do_system(const char *cmd)
  *   by the command issued in @param arguments with the specified arguments.
  */
 
+
 bool do_exec(int count, ...)
 {
     va_list args;
@@ -72,38 +73,45 @@ bool do_exec(int count, ...)
      *   as second argument to the execv() command.
      *
      */
-    int status;
     pid_t pid;
 
     pid = fork();
 
     if (pid == -1)
     {
+        perror("fork");
         return false;
     }
     
     if (pid == 0)
     {
-        int ret;
-        ret = execv(command[0],command);
-        if (ret == -1)
+        if (execv(command[0], command) == -1)
+        {
+            perror("execv");
+            // I originally was returning false here. I needed to look at another students code to compare and find my mistake.
+            // The mistake is that I was returning false from the child process instead of calling exit so the status was not
+            // being set properly so my checks below were failing
+            exit(1);
+        }
+    }
+    
+    int status;
+    if (waitpid(pid, &status, 0) == -1)
+    {
+        return false;
+    } 
+    
+    if (WIFEXITED(status))
+    {
+        printf("status: %d\n", status);
+        if (WEXITSTATUS(status) != 0)
         {
             return false;
         }
     }
 
-    if (waitpid(pid, &status, 0) == -1)
-    {
-        return false;
-    } 
-    else if (WIFEXITED(status))
-    {
-        if (WEXITSTATUS(status) != 0) {
-            return false;
-        }
-    }
-
     va_end(args);
+
     return true;
 }
 
@@ -162,7 +170,12 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
             return false;
         }
 
-        execv(command[0], command);
+        if (execv(command[0], command) == -1)
+        {
+            perror("execv");
+            exit(1);
+        }
+        
     }
 
     if (waitpid(pid, &status, 0) == -1)
